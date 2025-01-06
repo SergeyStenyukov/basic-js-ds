@@ -9,54 +9,119 @@ const { Node } = require('../extensions/list-tree.js');
 class BinarySearchTree {
 
   root() {
-    if (this.root == null)
-    return null;
-    return this.root;
+      if (this.rootNode === undefined)
+          return null;
+      return this.rootNode;
   }
 
   add(data) {
-    var newNode = new Node(data);
-    if (this.root === null) {
-      this.root = newNode;
-    } else {
-      this.recursionInsert(this.root, newNode);
-    }
+      const newNode = new Node(data);
+
+      if (!this.rootNode) {
+          this.rootNode = newNode;
+          return;
+      }
+
+      let currentNode = this.rootNode;
+      while (true) {
+          if (data < currentNode.data) {
+              if (!currentNode.left) {
+                  currentNode.left = newNode;
+                  return;
+              }
+              currentNode = currentNode.left;
+          } else {
+              if (!currentNode.right) {
+                  currentNode.right = newNode;
+                  return;
+              }
+              currentNode = currentNode.right;
+          }
+      }
   }
 
-  has(data) {}
+  has(data) {
+      let currentNode = this.rootNode;
+      while (currentNode) {
+          if (data === currentNode.data) {
+              return true;
+          } else if (data < currentNode.data) {
+              currentNode = currentNode.left;
+          } else {
+              currentNode = currentNode.right;
+          }
+      }
+      return false;
+  }
 
-  find(input) {}
+  find(data) {
+      let currentNode = this.rootNode;
+      while (currentNode) {
+          if (data === currentNode.data) {
+              return currentNode;
+          } else if (data < currentNode.data) {
+              currentNode = currentNode.left;
+          } else {
+              currentNode = currentNode.right;
+          }
+      }
+      return null;
+  }
 
-  remove(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  remove(data) {
+      this.rootNode = this.removeNode(this.rootNode, data);
   }
 
   min() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+      if (!this.rootNode) {
+          return null;
+      }
+      let currentNode = this.rootNode;
+      while (currentNode.left) {
+          currentNode = currentNode.left;
+      }
+      return currentNode.data;
   }
 
   max() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+      if (!this.rootNode)
+          return null;
+      let currentNode = this.rootNode;
+      while (currentNode.right)
+          currentNode = currentNode.right;
+      return currentNode.data;
   }
 
-  recursionInsert(existed_node, new_node) {
-    if (new_node.data <= existed_node.data) {
-      if (!existed_node.left) {
-        existed_node.left = new_node;
-      } else {
-        this.recursionInsert(existed_node.left, new_node);
-      }
-    } else {
-      if (!existed_node.right) {
-        existed_node.right = new_node;
-      } else {
-        this.recursionInsert(existed_node.right, new_node);
-      }
+    removeNode(node, data) {
+        if (!node)
+            return null;
+
+        if (data < node.data) {
+            node.left = this.removeNode(node.left, data);
+            return node;
+        } else if (data > node.data) {
+            node.right = this.removeNode(node.right, data);
+            return node;
+        } else {
+            if (!node.left && !node.right)
+                return null;
+            if (!node.left)
+                return node.right;
+            if (!node.right)
+                return node.left;
+
+            const minRightNode = this.findMinNode(node.right);
+            node.data = minRightNode.data;
+            node.right = this.removeNode(node.right, minRightNode.data);
+            return node;
+        }
     }
-  }
+
+    findMinNode(node) {
+        while (node.left)
+            node = node.left;
+        return node;
+    }
 }
 
 module.exports = {
